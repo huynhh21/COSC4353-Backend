@@ -122,7 +122,7 @@ app.put('/user/:id/update', upload.single('profilePic'), (req, res) => {
 app.put('/update/:id', (req, res) => {
     const { id } = req.params;
     const { name, email, password, username } = req.body;
-    let sql = "UPDATE busers SET `Name` = ?, `Email` = ?, `Username` = ?";
+    let sql = "UPDATE users SET `Name` = ?, `Email` = ?, `Username` = ?";
     let params = [name, email, username];
 
     if (password) {
