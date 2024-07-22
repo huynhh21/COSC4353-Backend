@@ -62,7 +62,7 @@ app.get('/volunteerHistory', (req, res) => {
   }
 
   const query = 'SELECT * FROM volunteer_history WHERE userId = ?';
-  pool.query(query, [userId], (error, results) => {
+  db.query(query, [userId], (error, results) => {
     if (error) {
       return res.status(500).json({ message: "Error retriving volunteer history" });
     }
