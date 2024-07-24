@@ -25,11 +25,12 @@ app.get("/", (req, res) => {
 })
 
 app.post('/create', (req, res) => { // Creates an event in the `event` table
-    const sql = "INSERT INTO event (`Name`, `Description`, `Location`, `Urgency`, `Date`) VALUES (?)";
+    const sql = "INSERT INTO event (`Name`, `Description`, `Location`, `RequiredSkills`, `Urgency`, `Date`) VALUES (?)";
     const values = [
         req.body.name,
         req.body.description,
         req.body.location,
+        req.body.requiredSkills,
         req.body.urgency,
         req.body.date
     ]
@@ -40,11 +41,12 @@ app.post('/create', (req, res) => { // Creates an event in the `event` table
 })
 
 app.put('/update/:id', (req, res) => { // Updates an event when a change needs to be made
-    const sql = "update event set `Name` = ?, `Description` = ?, `Location` = ?, `Urgency` = ?, `Date` = ? where ID = ?";
+    const sql = "update event set `Name` = ?, `Description` = ?, `Location` = ?, `RequiredSkills` = ?, `Urgency` = ?, `Date` = ? where ID = ?";
     const values = [
         req.body.name,
         req.body.description,
         req.body.location,
+        req.body.requiredSkills,
         req.body.urgency,
         req.body.date
     ]
