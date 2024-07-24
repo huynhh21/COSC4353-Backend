@@ -128,7 +128,7 @@ const verifyUser = (req, res, next) => { //once user is loggedin we verify by ch
 //once user is logged in they are redirected to there profile page (if we dont need profile pic use one above or remove pic stuff)
 app.get('/user/:id', verifyUser, (req, res) => {
     const { id } = req.params;
-    const sql = "SELECT ID, Name, Username, Email, bio, profilePic FROM users WHERE ID = ?";
+    const sql = "SELECT ID, Name, Username, Email, bio, profilePic, Address1, Address2, City, State, Zipcode, Skills, Preferences, Availability FROM users WHERE ID = ?";
     db.query(sql, [id], (err, data) => {
         if (err) return res.status(500).json({ message: "Error" });
         if (data.length > 0) {
