@@ -11,9 +11,9 @@ const db = {
     query: jest.fn()
 };
 
-// Importing your routes
+// Importing routes
 app.get("/", (req, res) => {
-    const sql = "SELECT * FROM event";
+    const sql = "SELECT * FROM eventdetails";
     db.query(sql, (err, data) => {
         if (err) return res.json("Error");
         return res.json(data);
@@ -21,11 +21,12 @@ app.get("/", (req, res) => {
 });
 
 app.post('/create', (req, res) => {
-    const sql = "INSERT INTO event (`Name`, `Description`, `Location`, `Urgency`, `Date`) VALUES (?)";
+    const sql = "INSERT INTO eventdetails (`event_name`, `description`, `location`, `required_skills`, `urgency`, `eventDate`) VALUES (?)";
     const values = [
         req.body.name,
         req.body.description,
         req.body.location,
+        req.body.requiredSkills,
         req.body.urgency,
         req.body.date
     ];
@@ -35,46 +36,47 @@ app.post('/create', (req, res) => {
     });
 });
 
-app.put('/update/:id', (req, res) => {
-    const sql = "update event set `Name` = ?, `Description` = ?, `Location` = ?, `Urgency` = ?, `Date` = ? where ID = ?";
+app.put('/update/:event_id', (req, res) => {
+    const sql = "UPDATE eventdetails SET `event_name` = ?, `description` = ?, `location` = ?, `required_skills` = ?, `urgency` = ?, `eventDate` = ? WHERE event_id = ?";
     const values = [
         req.body.name,
         req.body.description,
         req.body.location,
+        req.body.requiredSkills,
         req.body.urgency,
         req.body.date
     ];
-    const id = req.params.id;
-    db.query(sql, [...values, id], (err, data) => {
+    const event_id = req.params.event_id;
+    db.query(sql, [...values, event_id], (err, data) => {
         if (err) return res.json("Error");
         return res.json(data);
     });
 });
 
-app.delete('/event/:id', (req, res) => {
-    const sql = "DELETE FROM event WHERE ID = ?";
-    const id = req.params.id;
-    db.query(sql, [id], (err, data) => {
+app.delete('/event/:event_id', (req, res) => {
+    const sql = "DELETE FROM eventdetails WHERE event_id = ?";
+    const event_id = req.params.event_id;
+    db.query(sql, [event_id], (err, data) => {
         if (err) return res.json("Error");
         return res.json(data);
     });
 });
 
 app.get("/volunteer", (req, res) => {
-    const sql = "SELECT * FROM volunteer";
+    const sql = "SELECT * FROM userprofile";
     db.query(sql, (err, data) => {
         if (err) return res.json("Error");
         return res.json(data);
     });
 });
 
-app.put('/match/:id', (req, res) => {
-    const sql = "update volunteer set `Event` = ? where ID = ?";
+app.put('/match/:user_id', (req, res) => {
+    const sql = "UPDATE userprofile SET `event_match` = ? WHERE user_id = ?";
     const values = [
         req.body.matchedEvent
     ];
-    const id = req.params.id;
-    db.query(sql, [...values, id], (err, data) => {
+    const user_id = req.params.user_id;
+    db.query(sql, [...values, user_id], (err, data) => {
         if (err) return res.json("Error");
         return res.json(data);
     });
@@ -87,7 +89,7 @@ describe("API Tests", () => {
     });
 
     it("GET / should return all events", async () => {
-        const mockData = [{ ID: 1, Name: "Test Event", Description: "Description", Location: "Location", Urgency: "High", Date: "2024-07-18" }];
+        const mockData = [{ event_id: 1, event_name: "Test Event", description: "Description", location: "Location", required_skills: "Skills", urgency: "High", eventDate: "2024-07-18" }];
         db.query.mockImplementation((sql, callback) => {
             callback(null, mockData);
         });
@@ -108,6 +110,7 @@ describe("API Tests", () => {
                 name: "New Event",
                 description: "New Description",
                 location: "New Location",
+                requiredSkills: "Skills",
                 urgency: "Medium",
                 date: "2024-07-19"
             });
@@ -115,7 +118,7 @@ describe("API Tests", () => {
         expect(response.body).toEqual(mockData);
     });
 
-    it("PUT /update/:id should update an event", async () => {
+    it("PUT /update/:event_id should update an event", async () => {
         const mockData = { affectedRows: 1 };
         db.query.mockImplementation((sql, values, callback) => {
             callback(null, mockData);
@@ -127,6 +130,7 @@ describe("API Tests", () => {
                 name: "Updated Event",
                 description: "Updated Description",
                 location: "Updated Location",
+                requiredSkills: "Updated Skills",
                 urgency: "Low",
                 date: "2024-07-20"
             });
@@ -134,7 +138,7 @@ describe("API Tests", () => {
         expect(response.body).toEqual(mockData);
     });
 
-    it("DELETE /event/:id should delete an event", async () => {
+    it("DELETE /event/:event_id should delete an event", async () => {
         const mockData = { affectedRows: 1 };
         db.query.mockImplementation((sql, values, callback) => {
             callback(null, mockData);
@@ -145,7 +149,7 @@ describe("API Tests", () => {
     });
 
     it("GET /volunteer should return all volunteers", async () => {
-        const mockData = [{ ID: 1, Name: "Test Volunteer", Event: "Test Event" }];
+        const mockData = [{ user_id: 1, name: "Test Volunteer", event_match: "Test Event" }];
         db.query.mockImplementation((sql, callback) => {
             callback(null, mockData);
         });
@@ -154,7 +158,7 @@ describe("API Tests", () => {
         expect(response.body).toEqual(mockData);
     });
 
-    it("PUT /match/:id should match a volunteer with an event", async () => {
+    it("PUT /match/:user_id should match a volunteer with an event", async () => {
         const mockData = { affectedRows: 1 };
         db.query.mockImplementation((sql, values, callback) => {
             callback(null, mockData);
