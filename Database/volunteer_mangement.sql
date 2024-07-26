@@ -33,7 +33,7 @@ CREATE TABLE `eventdetails` (
 CREATE TABLE `volunteerhistory` (
   `event_id` varchar(255),
   `user_id` int,
-  `user_participation` varchar(255)
+  `participation` varchar(255)
 );
 
 CREATE TABLE `states` (
