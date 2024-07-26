@@ -289,7 +289,7 @@ describe('API Endpoints', () => {
         token = response.headers['set-cookie'][0].split(';')[0].split('=')[1];
     });
 
-    it('should fetch all users without authentication', async () => {
+    it('should fetch all users', async () => {
         const response = await request(app)
             .get('/');
 
@@ -330,6 +330,26 @@ describe('API Endpoints', () => {
 
         expect(response.statusCode).toBe(200);
         expect(response.body.message).toBe('User credentials updated successfully');
+    });
+
+    it('should update user profile management information', async () => {
+        const response = await request(app)
+            .put(`/profile-management/${userId}`)
+            .set('Cookie', [`token=${token}`])
+            .send({
+                name: 'Updated Name',
+                address1: 'New Address 1',
+                address2: 'New Address 2',
+                city: 'New City',
+                state: 'New State',
+                zipcode: '12345',
+                skills: ['JavaScript', 'Node.js'],
+                preferences: 'Updated preferences',
+                availability: ['Monday', 'Wednesday']
+            });
+    
+        expect(response.statusCode).toBe(200);
+        expect(response.body.message).toBe('Profile managed successfully');
     });
 
     it('should logout the user', async () => {
