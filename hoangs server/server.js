@@ -56,13 +56,13 @@ app.delete('/notifications/:id', (req, res) => {
 
 // Get volunteer history for a specific user
 app.get('/volunteerHistory', (req, res) => {
-  const userId = req.query.userId;
-  if (!userId) {
+  const user_id = req.query.user_id;
+  if (!user_id) {
     return res.status(400).json({ error: 'User ID is required' });
   }
 
-  const query = 'SELECT * FROM volunteer_history WHERE userId = ?';
-  db.query(query, [userId], (error, results) => {
+  const query = 'SELECT u.user_id, e.event_name, e.description, e.location, e.required_skills, e.urgency, e.event_date, v.participation FROM userprofile u JOIN volunteerhistory v ON u.user_id = v.user_id JOIN eventdetails e ON v.event_id = e.event_id WHERE u.user_id = ?';
+  db.query(query, [user_id], (error, results) => {
     if (error) {
       return res.status(500).json({ message: "Error retriving volunteer history" });
     }
