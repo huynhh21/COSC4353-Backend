@@ -1,6 +1,6 @@
 CREATE TABLE `usercredentials` (
-  `user_id` integer PRIMARY KEY,
-  `email` varchar(255),
+  `user_id` integer AUTO_INCREMENT PRIMARY KEY,
+  `email` varchar(255) UNIQUE NOT NULL,
   `password` varchar(255),
   `role` ENUM('volunteer', 'admin')
 );
@@ -32,7 +32,7 @@ CREATE TABLE `eventdetails` (
 );
 
 CREATE TABLE `volunteerhistory` (
-  `volunteer_event_id` int,
+  `volunteer_event_id` int AUTO_INCREMENT PRIMARY KEY,
   `user_id` int,
   `event_id` int,
   `participation` varchar(255)
