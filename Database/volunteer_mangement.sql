@@ -35,7 +35,7 @@ CREATE TABLE `volunteerhistory` (
   `volunteer_event_id` int AUTO_INCREMENT PRIMARY KEY,
   `user_id` int,
   `event_id` int,
-  `participation` varchar(255)
+  `participation` varchar(255),
   FOREIGN KEY (user_id) REFERENCES usercredentials(user_id)
   FOREIGN KEY (event_id) REFERENCES eventdetails(event_id)
 );
