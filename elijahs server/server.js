@@ -79,9 +79,11 @@ app.get("/volunteer", (req, res) => {
 })
 
 app.put('/match/:user_id', (req, res) => { // Matches volunteer with an event by updating their `Event` column with the name of the event
-    const sql = "update userprofile set `event_match` = ? where user_id = ?"; //INSERT INTO volunteerhistory (user_id, event_id, participation) VALUES (?, ?, ?)
+    const sql = "INSERT INTO volunteerhistory (user_id, event_id, participation) VALUES (?, ?, ?)";
     const values = [
-        req.body.matchedEvent
+        req.body.user_id,
+        req.body.matchedEvent,
+        req.body.participation
     ]
 
     const user_id = req.params.user_id;
