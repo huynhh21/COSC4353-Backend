@@ -41,7 +41,7 @@ app.post('/create', (req, res) => { // Creates an event in the `event` table
 })
 
 app.put('/update/:event_id', (req, res) => { // Updates an event when a change needs to be made
-    const sql = "update eventdetails set `event_name` = ?, `description` = ?, `location` = ?, `required_skills` = ?, `urgency` = ?, `eventDate` = ? where event_id = ?";
+    const sql = "UPDATE eventdetails SET event_name = ?, description = ?, location = ?, required_skills = ?, urgency = ?, event_date = ? WHERE event_id = ?";
     const values = [
         req.body.name,
         req.body.description,
@@ -54,8 +54,19 @@ app.put('/update/:event_id', (req, res) => { // Updates an event when a change n
     const event_id = req.params.event_id;
 
     db.query(sql, [...values, event_id], (err, data) => {
-        if(err) return res.json("Error");
-        return res.json(data);
+        if(err) {
+            return res.json("Error")
+        }
+
+        //notifies the volunteers about event updates that they are attached to
+        const notifyQuery = `INSERT INTO notifications (user_id, message) SELECT vh.user_id, CONCAT('Event "', ?, '" has been updated.') FROM volunteerhistory vh WHERE vh.event_id = ?`;
+
+        db.query(notifyQuery, [event_name, event_id], (notifyErr) => {
+            if (notifyErr) {
+              return res.status(500).json({ error: notifyErr.message });
+            }
+            res.status(200).json({ message: 'Event updated and volunteers notified successfully' });
+        })
     })
 })
 
@@ -89,8 +100,19 @@ app.put('/match/:user_id', (req, res) => { // Matches volunteer with an event by
     const user_id = req.params.user_id;
 
     db.query(sql, [...values, user_id], (err, data) => {
-        if(err) return res.json("Error");
-        return res.json(data);
+        if(err) {
+            return res.json("Error")
+        }
+
+        //notifies volunteer about an event they've been assigned to
+        const notifyQuery = `INSERT INTO notifications (user_id, message) SELECT vh.user_id, CONCAT('You've been matched with "', ?, '" event.') FROM volunteerhistory vh WHERE vh.event_id = ?`;
+
+        db.query(notifyQuery, [event_name, event_id], (notifyErr) => {
+            if (notifyErr) {
+              return res.status(500).json({ error: notifyErr.message });
+            }
+            res.status(200).json({ message: 'Volunteer matched and notified successfully' });
+        })
     })
 })
 
