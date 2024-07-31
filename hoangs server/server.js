@@ -28,7 +28,7 @@ app.get('/notifications', (req, res) => {
     return res.status(400).json({ error: 'User ID is required' });
   }
 
-  const query = 'SELECT * FROM notifications WHERE userId = ?';
+  const query = 'SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC';
   db.query(query, [userId], (error, results) => {
     if (error) {
       return res.status(500).json({ message: "Error retriving notifications" });
@@ -45,7 +45,7 @@ app.delete('/notifications/:id', (req, res) => {
     return res.status(400).json({ error: 'User ID is required' });
   }
 
-  const query = 'DELETE FROM notifications WHERE id = ? AND userId = ?';
+  const query = 'DELETE FROM notifications WHERE notification_id = ? AND user_id = ?';
   db.query(query, [id, userId], (error, results) => {
     if (error) {
       return res.status(500).json({ message: "Error dismissing notification" });
@@ -61,7 +61,7 @@ app.get('/volunteerHistory', (req, res) => {
     return res.status(400).json({ error: 'User ID is required' });
   }
 
-  const query = 'SELECT u.user_id, e.event_name, e.description, e.location, e.required_skills, e.urgency, e.event_date, v.participation FROM userprofile u JOIN volunteerhistory v ON u.user_id = v.user_id JOIN eventdetails e ON v.event_id = e.event_id WHERE u.user_id = ?';
+  const query = 'SELECT vh.participation, e.event_name, e.description, e.location, e.required_skills, e.urgency, e.event_date FROM volunteerhistory vh JOIN eventdetails e ON vh.event_id = e.event_id WHERE vh.user_id = ? ORDER BY e.event_date DESC';
   db.query(query, [user_id], (error, results) => {
     if (error) {
       return res.status(500).json({ message: "Error retriving volunteer history" });
