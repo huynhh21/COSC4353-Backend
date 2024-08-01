@@ -22,7 +22,7 @@ CREATE TABLE `userprofile` (
 );
 
 CREATE TABLE `eventdetails` (
-  `event_id` char PRIMARY KEY,
+  `event_id` integer AUTO_INCREMENT PRIMARY KEY,
   `event_name` varchar(255),
   `description` varchar(255),
   `location` varchar(255),
