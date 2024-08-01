@@ -6,6 +6,10 @@ const bcrypt = require("bcrypt");
 const multer = require('multer');
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const { Parser } = require('json2csv');
+const pdf = require('html-pdf');
+const fs = require('fs');
+const ejs = require('ejs');
 
 const salt = 10; // encrypted with 10 characters
 
