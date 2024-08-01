@@ -484,7 +484,64 @@ app.delete('/pricing/:id', (req, res) => {
     });
 });
 
+//generate volunteer activity reports
+app.get('/reports/volunteer-activity', async (req, res) => {
+    const format = req.query.format; // 'pdf' or 'csv'
+    const sql = `SELECT up.full_name, vh.participation, e.event_name, e.description, e.location, e.required_skills, e.urgency, e.event_date FROM volunteerhistory vh JOIN userprofile up ON vh.user_id = up.user_id JOIN eventdetails e ON vh.event_id = e.event_id ORDER BY up.full_name, e.event_date DESC`;
 
+    db.query(sql, async (err, data) => {
+        if (err) return res.status(500).json({ message: "Error fetching volunteer activity data" });
+        if (format === 'csv') {
+            generateCSVReport(data, res, 'volunteer_activity_report');
+        } else if (format === 'pdf') {
+            generatePDFReport(data, res, 'volunteer_activity_report', 'volunteer_activity_report_template.ejs');
+        } else {
+            res.status(400).json({ message: "Invalid format specified" });
+        }
+    });
+});
+
+//generate event management reports
+app.get('/reports/event-management', async (req, res) => {
+    const format = req.query.format; // 'pdf' or 'csv'
+    const sql = `SELECT e.event_name, e.description, e.location, e.required_skills, e.urgency, e.event_date, up.full_name FROM eventdetails e LEFT JOIN volunteerhistory vh ON e.event_id = vh.event_id LEFT JOIN userprofile up ON vh.user_id = up.user_id ORDER BY e.event_date DESC`;
+
+    db.query(sql, async (err, data) => {
+        if (err) return res.status(500).json({ message: "Error fetching event management data" });
+        if (format === 'csv') {
+            generateCSVReport(data, res, 'event_management_report');
+        } else if (format === 'pdf') {
+            generatePDFReport(data, res, 'event_management_report', 'event_management_report_template.ejs');
+        } else {
+            res.status(400).json({ message: "Invalid format specified" });
+        }
+    });
+});
+
+const generateCSVReport = (data, res, fileName) => {
+    const fields = Object.keys(data[0]);
+    const parser = new Parser({ fields });
+    const csv = parser.parse(data);
+
+    res.header('Content-Type', 'text/csv');
+    res.attachment(`${fileName}.csv`);
+    return res.send(csv);
+};
+
+const generatePDFReport = (data, res, fileName, template) => {
+    ejs.renderFile(path.join(__dirname, 'templates', template), { data }, (err, html) => {
+        if (err) return res.status(500).json({ message: "Error generating PDF report" });
+
+        const options = { format: 'A4' };
+        pdf.create(html, options).toStream((err, stream) => {
+            if (err) return res.status(500).json({ message: "Error generating PDF report" });
+
+            res.header('Content-Type', 'application/pdf');
+            res.attachment(`${fileName}.pdf`);
+            return stream.pipe(res);
+        });
+    });
+};
 
 app.listen(8081, () => {
     console.log("Server is running on port 8081...");
