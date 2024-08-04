@@ -523,22 +523,33 @@ app.get('/reports/event-management', async (req, res) => {
 });
 
 const generateCSVReport = (data, res, fileName) => {
-    const fields = Object.keys(data[0]);
-    const parser = new Parser({ fields });
-    const csv = parser.parse(data);
+    try {
+        const fields = Object.keys(data[0]);
+        const parser = new Parser({ fields });
+        const csv = parser.parse(data);
 
-    res.header('Content-Type', 'text/csv');
-    res.attachment(`${fileName}.csv`);
-    return res.send(csv);
+        res.header('Content-Type', 'text/csv');
+        res.attachment(`${fileName}.csv`);
+        return res.send(csv);
+    } catch (error) {
+        console.error("Error generating CSV report", error);
+        res.status(500).json({ message: "Error generating CSV report" });
+    }
 };
 
 const generatePDFReport = (data, res, fileName, template) => {
     ejs.renderFile(path.join(__dirname, 'templates', template), { data }, (err, html) => {
-        if (err) return res.status(500).json({ message: "Error generating PDF report" });
+        if (err) {
+            console.error("Error rendering EJS template", err);
+            return res.status(500).json({ message: "Error rendering EJS template" });
+        }
 
         const options = { format: 'A4' };
         pdf.create(html, options).toStream((err, stream) => {
-            if (err) return res.status(500).json({ message: "Error generating PDF report" });
+            if (err) {
+                console.error("Error creating PDF", err);
+                return res.status(500).json({ message: "Error creating PDF" });
+            }
 
             res.header('Content-Type', 'application/pdf');
             res.attachment(`${fileName}.pdf`);
