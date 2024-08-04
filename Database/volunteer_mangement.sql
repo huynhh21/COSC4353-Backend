@@ -41,7 +41,7 @@ CREATE TABLE `volunteerhistory` (
 );
 
 CREATE TABLE `notifications` (
-    `notification_id` int,
+    `notification_id` int AUTO_INCREMENT PRIMARY KEY,
     `user_id` int,
     `message` TEXT,
     `created_at` timestamp DEFAULT current_timestamp,
